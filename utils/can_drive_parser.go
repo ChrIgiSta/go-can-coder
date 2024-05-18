@@ -44,6 +44,11 @@ func NewCanDriveParser() *CanDriveParser {
 }
 
 func (p *CanDriveParser) Unmarshal(in []byte) *can.Frame {
+
+	if len(in) > 0 && in[0] == 0x00 {
+		in = in[1:]
+	}
+
 	split := strings.Split(string(in), ",")
 	if len(split) != 4 {
 		log.Error("custom parser",
@@ -53,7 +58,7 @@ func (p *CanDriveParser) Unmarshal(in []byte) *can.Frame {
 	arbitrationID, err := strconv.ParseUint(split[0], 16, 32)
 	if err != nil {
 		log.Error("custom parser",
-			"cannot parse canDrive Formated arbitration id: %v", err)
+			"cannot parse canDrive Formated arbitration id [%s]: %v", split[0], err)
 		return nil
 	}
 	data, err := hex.DecodeString(split[3])
@@ -83,5 +88,14 @@ func (p *CanDriveParser) Marshal(in *can.Frame) []byte {
 	RTR := 0 // Remote Trasmission request
 	IDE := 0 // Identifier Extended falg
 
-	return []byte(fmt.Sprintf("%x,%d,%d,%x\n", in.ArbitrationID, RTR, IDE, in.GetData()))
+	arbId := []byte{
+		byte((in.ArbitrationID >> 24) & 0xff),
+		byte((in.ArbitrationID >> 16) & 0xff),
+		byte((in.ArbitrationID >> 8) & 0xff),
+		byte(in.ArbitrationID & 0xff),
+	}
+
+	canDriveFormat := []byte(fmt.Sprintf("%x,%d,%d,%x\n", arbId, RTR, IDE, in.GetData()))
+
+	return canDriveFormat
 }

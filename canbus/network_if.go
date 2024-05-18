@@ -86,5 +86,5 @@ func (i *NetworkIf) Disconnect() error {
 }
 
 func (i *NetworkIf) Send(message *can.Frame) error {
-	return i.bus.Write(&can.Frame{})
+	return i.bus.Write(message)
 }

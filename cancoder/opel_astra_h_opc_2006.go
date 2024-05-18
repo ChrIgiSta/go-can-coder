@@ -25,6 +25,16 @@
 
 package cancoder
 
+// CAN
+//   female plug (car)
+//  __________________________________________  Astra H:
+//  \     __  __  __  __  __  __  __  __     /    * GM Lan (Low Speed SW CAN)     <33.3 kbps>: high <pin 1>
+//   \     1   2   3   4   5   6   7   8    /     * Entertainment CAN (Mid Speed)   <95 kbps>: high <pin 3> / low <pin 11> (maybe 95.238 kbps)
+//    \      ________________________      /      * High Speed CAN                 <500 kbps>: high <pin 6> / low <pin 14>
+//     \  __  __  __  __  __  __  __  __  /
+//      \  9  10  11  12  13  14  15  16 /          (High Speed also accessable via standard OBD2 Dongles (Bluetooth/WiFi devices))
+//       \______________________________/
+
 // low speed
 const (
 	BREAK_PRESSED = 0x40
@@ -78,6 +88,11 @@ const (
 	AC_MODE_HEAD_FOOD      = 88
 	AC_MODE_BODY_FOOD      = 86
 	AC_MODE_HEAD_BODY_FOOD = 82
+
+	DOOR_LOCK_UNLOCK       = 0x20
+	DOOR_LOCK_LOCK         = 0x80
+	DOOR_LOCK_WINDOWS_DOWN = 0x30
+	DOOR_LOCK_WINDOWS_UP   = 0xC0
 )
 
 // mid speed
@@ -104,6 +119,7 @@ const (
 	GMLanFullInjection      GMLanArbitrationIDs = 0x130 // not valid as it is, seems to be a counter (ml/s or something like that)
 	GMLanCoolant            GMLanArbitrationIDs = 0x145 // tested
 	GMLanCruseControl       GMLanArbitrationIDs = 0x145 // tested
+	GMLanRemoteKey          GMLanArbitrationIDs = 0x160
 	GMLanWeelRemoteControll GMLanArbitrationIDs = 0x175 // tested
 	GMLanMilage             GMLanArbitrationIDs = 0x190 // tested
 	GMLanDoorState          GMLanArbitrationIDs = 0x230 // tested
@@ -395,6 +411,15 @@ var OpelAstraHOpc2006GMLan []CanValueMap = []CanValueMap{
 			Name:        SystemTime,
 		},
 		TriggerEvent: true,
+	},
+	{
+		ArbitrationID: uint32(GMLanRemoteKey),
+		CanValueDef: CanValueDef{
+			Unit:        "",
+			Calculation: "${1}",
+			Condition:   "${0} == 0x02 && ${2} == 0x70 && ${3} == 0xD6",
+			Name:        DoorLook,
+		},
 	},
 }
 

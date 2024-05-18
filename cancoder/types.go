@@ -66,6 +66,7 @@ const (
 	RangeWarning       CanVars = "Range Warning"              // tested
 	TraveledDistance   CanVars = "Traveled Distance"          // tested
 	Distance           CanVars = "Distance"
+	DoorLook           CanVars = "Door Lock"
 )
 
 type CanValueDef struct {

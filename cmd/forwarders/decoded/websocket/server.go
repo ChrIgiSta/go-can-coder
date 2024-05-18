@@ -76,7 +76,7 @@ func can2Websocket(cancoderDef cancoder.CancoderDef, token string, cert []byte, 
 	for _, def := range cancoderDef.Cancoders {
 		canDev := canbus.NewIface(def.Device)
 		// canIfs = append(canIfs, canDev)
-		canDec := cancoder.NewCanDecoder(def.Map)
+		canDec := cancoder.NewCanCoder(def.Map)
 		// canDecoders = append(canDecoders, canDec)
 		wg.Add(1)
 		canRx, err := canDev.Connect(&wg)
